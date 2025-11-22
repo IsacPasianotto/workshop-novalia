@@ -1,0 +1,429 @@
+---
+title: "Data 101"
+subtitle: "Introduzione al Data Management"
+author: "Isac Pasianotto"
+date: "13 December 2025"
+format:
+  revealjs:
+    footer: "Isac Pasianotto - 13/12/2025"
+    theme: ./mytheme.css
+    transition: slide
+    scrollable: true
+    smaller: false
+    toc: true
+    toc-depth: 1
+    toc-title: "Agenda"
+    slide-number: true
+    self-contained: true
+    pdf-separate-fragments: false
+    notes: false
+    code-line-numbers: false
+---
+
+# Concetti introduttivi
+
+## Dato vs informazione?
+
+::: {.columns}
+:::: {.column width="33%"}
+<div class="fragment" data-fragment-index="1">
+<img src="img/finland1.png" width="75%" style="display: block; margin-left: auto; margin-right: auto;">
+</div>
+::::
+
+:::: {.column width="33%"}
+<div class="fragment" data-fragment-index="2">
+<img src="img/finland2.png" width="75%" style="display: block; margin-left: auto; margin-right: auto;">
+</div>
+::::
+
+:::: {.column width="33%"}
+<div class="fragment" data-fragment-index="3">
+<img src="img/finland3.png" width="75%" style="display: block; margin-left: auto; margin-right: auto;">
+</div>
+::::
+:::
+
+<br>
+
+::: {.columns}
+:::: {.column width="33%"}
+<div class="fragment" data-fragment-index="4">
+giorni feriali
+</div>
+::::
+
+:::: {.column width="33%"}
+<div class="fragment" data-fragment-index="4">
+sabato/pre-festivi
+</div>
+::::
+
+:::: {.column width="33%"}
+<div class="fragment" data-fragment-index="4">
+giorni festivi
+</div>
+::::
+:::
+
+## Dato vs informazione?
+
+::: {.fragment .fade-in style="font-size: 80%;"}
+- ***Informazione***: Notizia o elemento nozionistico acquisito mediante un vettore (es. studio, osservazione, comunicazione, ...) che consente di avere una conoscienza su un fenomeno o un contesto.
+:::
+
+::: {.fragment .fade-in style="font-size: 80%;"}
+- ***Dato***: Rappresentazione di un'informazione in forma codificata, adatta per la comunicazione, l'elaborazione o l'archiviazione.
+:::
+
+::: {.fragment .fade-in style="font-size: 80%;"}
+::: {.callout-note title="Nota"}
+Il dato di per sè non ha un significato, ma lo acquisisce solo nel momento in cui viene interpretato e contestualizzato, diventando così informazione.
+:::
+:::
+
+## Dato vs informazione?
+
+\
+
+::: {.columns}
+:::: {.column width="50%"}
+![](img/finland1.png){style="display: block; margin-left: auto; margin-right: auto;"}
+::::
+
+:::: {.column width="50%"}
+\ 
+
+_"Divieto di sosta dalle 08:00 alle 17:00 nei giorni feriali"_
+::::
+:::
+
+<br>
+
+::: {.columns}
+:::: {.column width="50%" style="text-align: center;"}
+*Dato*
+::::
+
+:::: {.column width="50%" style="text-align: center;"}
+*Informazione*
+::::
+:::
+
+## La rappresentazione dei dati conta!
+
+\ 
+
+::: {.fragment .fade-in style="font-size: 100%; text-align: center;"}
+**100100111101001101**
+:::
+
+::: {.fragment .fade-in style="font-size: 80%;"}
+Che numero è?
+:::
+
+::: {.fragment .fade-in style="font-size: 80%;"}
+| Rappresentazione | Valore  |
+|------------------|---------|
+| Naturale         | 37,843  |
+| Intero           | -27,263 |
+| Floating point   | 9.55e-4 |
+:::
+
+## Database
+
+::: {.fragment .fade-in}
+::: {.callout-note title="Database: definizione"}
+Collezione organizzata e strutturata di dati, registrati in un qualsiasi supporto che ne consente l'accesso per una applicazione o organo di gestione.
+:::
+:::
+
+\
+
+::: {.fragment .fade-in style="font-size: 80%;"}
+- Registro cartaceo
+- File di testo
+- Collezione di oggetti digitali 
+- ...
+:::
+
+## DataBase Management System (DBMS)
+
+::: {.fragment .fade-in}
+::: {.callout-note title="DBMS: definizione"}
+Software che consente la gestione, l'organizzazione e la manipolazione di un una grande collezione di dati (database).
+:::
+:::
+
+::: {.fragment .fade-in style="font-size: 80%;"}
+- **Dimensioni**: la dimensione dei dati gestiti è molto superiore alla memoria centrale disponibile.
+- **Persistenza**: i dati devono essere memorizzati in modo permanente su memoria di massa, resistendo quindi a spegnimenti, crash, ecc.
+- **Concorrenza e Condivisione**: più utenti e/o applicativi possono accedere contemporaneamente ai dati.
+:::
+
+
+## DataBase Management System (DBMS)
+
+Un DBMS _deve_ garantire: 
+
+::: {.fragment .fade-in style="font-size: 80%;"}
+- **Affidabilità**: i dati devono essere memorizzati in modo sicuro e protetto da guasti hardware o software.
+:::
+::: {.fragment .fade-in style="font-size: 80%;"}
+- **Access control**: i dati devono essere protetti da accessi non autorizzati.
+:::
+::: {.fragment .fade-in style="font-size: 80%;"}
+- **Integrità**: i dati devono essere consistenti e validi secondo delle regole pre-definite.
+:::
+::: {.fragment .fade-in style="font-size: 80%;"}
+- **Efficienza**: le operazioni di accesso e manipolazione dei dati devono essere eseguite in modo rapido ed efficiente.
+:::
+
+
+## Ciclo di vita dei dati
+
+::: {.fragment .fade-in}
+::: {.callout-note title="Ciclo di vita dei dati"}
+Insieme delle fasi che un dato attraversa dalla sua creazione alla sua eliminazione
+:::
+:::
+
+::: {.r-stack .fade-in style="font-size: 80%;"}
+
+
+![](img/ciclo-dato1.png){.fragment width="100%"}
+
+![](img/ciclo-dato2.png){.fragment width="100%"}
+
+:::
+
+## DBMS - componenti
+
+::: {.columns}
+:::: {.column width="50%"}
+
+![](img/db-architettura.png){width="100%"}
+::::
+
+:::: {.column width="50%"}
+
+::: {.fragment .incremental .fade-in style="font-size: 80%;"}
+
+ - ***Schema interno***: Rappresentazione dello schema logico per mezzo di strutture di memorizzazione (es, file xml, binari, ...)
+ - ***Schema logico***: Come è organizzato il database; esistono diverse soluzioni: (gerarchico, reticolare, relazionale, a oggetti, ...)
+ - ***Vista***: (schema esterno): Rappresentazione parziale del database, personalizzata per un particolare utente o applicazione.
+
+:::
+
+:::
+:::
+
+
+## Data Base Systems
+
+
+::: {.fragment .fade-in style="font-size: 80%;"}
+***Software:***
+:::
+::: {.fragment .fade-in style="font-size: 70%;"}
+  -  **DBMS**: interposto tra utente/applicazione e database, gestisce l'accesso ai dati.
+  - **Utility di supporto** per operazioni di sviluppo e/o backup
+:::
+
+::: {.fragment .fade-in style="font-size: 80%;"}
+***Utenti coinvolti:***
+:::
+
+::: {.fragment .fade-in style="font-size: 70%;"}
+- Proggettista del DB
+- Amministratore del DB
+- Sviluppatore di applicazioni
+- Utente finale
+:::
+
+::: {.fragment .fade-in style="font-size: 60%;"}
+- - -
+- Schemi (struttura dei dati)
+- Hardware utilizzato 
+:::
+
+## Il vero vantaggio 
+
+\
+
+::: {.fragment .fade-in style="font-size: 140%; text-align: center;"}
+***INDIPENDENZA DEI DATI DALL'APPLICAZIONE***
+:::
+
+\
+
+::: {.fragment .fade-in style="font-size: 80%;"}
+La logica del programma è indipentende dalla gestione dei dati!
+:::
+
+---
+
+# Modello relazionale
+
+## Schema logico relazionale:
+
+::: {.fragment .fade-in style="font-size: 80%;"}
+Le *12 regole di Codd* (1970) definiscono le caratteristiche che un DBMS relazionale deve avere:
+:::
+
+::: {.fragment .fade-in style="font-size: 80%;"}
+::: {.callout-tip title="\ 1 -  Informazioni"}
+Tutte le informazioni in un DBR sono rappresentate esplicitamente da valori in tabelle *(definizione)*.
+:::
+:::
+
+::: {.fragment .fade-in style="font-size: 80%;"}
+::: {.callout-tip title="\ 2 -  Garanzia di accesso"}
+Ogni valore in un DBR è accessibile tramite la combinazione del nome della tabella, del nome della colonna e della chiave primaria.
+:::
+:::
+
+::: {.fragment .fade-in style="font-size: 80%;"}
+::: {.callout-tip title="\ 3 -  Rappresentazione sistematica dei valori null"}
+Il DBR supporta la rappresentazione di valori null (mancanti o non applicabili) in modo sistematico e distinto da altri valori.
+:::
+:::
+
+---
+
+## Le 12 regole di Codd (continua)
+
+::: {.fragment .fade-in style="font-size: 80%;"}
+::: {.callout-tip title="4 – System table"}
+Un database relazionale deve essere strutturato logicamente come i dati e gestibile con lo stesso linguaggio.
+:::
+:::
+
+::: {.fragment .fade-in style="font-size: 80%;"}
+::: {.callout-tip title="5 – Linguaggio di dati e di manipolazione"}
+Un DBR può supportare diversi linguaggi, ma deve supportare un linguaggio “English-like” (→ SQL), in cui sia possibile: 1. Definire dati 2. Manipolare dati 3. Definire viste 4. Gestire l’integrità
+:::
+:::
+
+::: {.fragment .fade-in style="font-size: 80%;"}
+::: {.callout-tip title="6 – Aggiornamenti basati su viste"}
+Tutte le viste che sono logicamente aggiornabili devono essere aggiornabili tramite il DBR (cruciale per i campi calcolati).
+:::
+:::
+
+::: {.fragment .fade-in style="font-size: 80%;"}
+::: {.callout-tip title="7 – Inserimenti, aggiornamenti dei dati da linguaggio"}
+Inserire e aggiornare devono avere la stessa logica “a righe” dell’estrazione *(set-oriented approach)*.
+:::
+:::
+
+---
+
+## Le 12 regole di Codd (continua)
+
+::: {.fragment .fade-in style="font-size: 80%;"}
+::: {.callout-tip title="8 – Indipendenza dei dati fisici"}
+I programmi applicativi non devono sentire alcuna modifica fatta sul metodo e la locazione fisica dei dati.
+:::
+:::
+
+::: {.fragment .fade-in style="font-size: 80%;"}
+::: {.callout-tip title="9 – Indipendenza dei dati logici"}
+Le modifiche al livello logico non devono richiedere cambiamenti non giustificati alle applicazioni che utilizzano il database.
+:::
+:::
+
+::: {.fragment .fade-in style="font-size: 80%;"}
+::: {.callout-tip title="10 – Integrità"}
+Tutte le regole di integrità devono essere specificate nel linguaggio di definizione dei dati e applicate dal DBR.
+:::
+:::
+
+## Le 12 regole di Codd (continua)
+
+
+::: {.fragment .fade-in style="font-size: 80%;"}
+::: {.callout-tip title="11 – Distribuzione"}
+La distribuzione di porzioni del database su una o più allocazione fisiche o geografiche deve essere invisibile agli utenti del sistema.
+:::
+:::
+
+::: {.fragment .fade-in style="font-size: 80%;"}
+::: {.callout-tip title="12 – Prevenzione accessi non autorizzati"}
+Garantisce l’impossibilità di bypassare le regole di
+integrità e di accesso ai dati.
+:::
+:::
+
+## Modello relazionale - concetti base
+
+::: {.fragment .fade-in}
+***"Relazione"***: lemma infelice nella lingua italiana, che raccoglie due concetti distinti:
+:::
+
+\
+
+::: {.fragment .fade-in}
+***Relation***: relazione matematica, concetto che deriva dalla teoria degli insiemi.
+:::
+
+\ 
+
+::: {.fragment .fade-in}
+***Relationship***: collegamento logico tra entità.
+:::
+
+## Relazione: relation 
+
+::: {.fragment .fade-in style="font-size: 80%;"}
+Siano $D_1,\ D_2,\ \dots,\ D_n$ $n$ insiemi anche distinti detti **domini**.
+:::
+
+
+::: {.fragment .fade-in style="font-size: 80%;"}
+Sia $D$ il **Prodotto cartesiano** dei domini:  
+$D = D_1 \times D_2 \times \dots \times D_n$  
+
+
+ovvero l'insieme delle $n$-tuple $(d_1, d_2, \dots, d_n)$ con $d_i \in D_i$ per $i = 1, 2, \dots, n$.
+:::
+
+\
+
+::: {.fragment .fade-in style="font-size: 80%;"}
+Una **relazione** $R$ su $D_1, D_2, \dots, D_n$ è un sottoinsieme di $D$, ovvero $R \subseteq D$.
+:::
+
+## Relation: proprietà
+
+::: {.fragment .incremental .fade-in style="font-size: 80%;"}
+- Non esistono ordinamenti tra le tuple di una relazione.
+- Tutte le tuple di una relazione sono distinte (non esistono duplicati).
+- L'ordine degli attributi (colonne) è irrilevante.
+- Ogni attributo (colonna) ha un dominio associato.
+:::
+
+::: {.fragment .incremental .fade-in style="font-size: 80%;"}
+Una tabella è una relazione se: 
+
+- I valori di ogni colonna sono omogenei.
+- Le righe sono diverse fra loro. 
+- Le intestazioni delle colonne sono diverse fra loro
+:::
+
+
+## Relation: esempio 
+
+\
+
+
+| Casa |  Trasferta | Goal Casa | Goal Trasferta |
+|------|------------|-----------|----------------|
+| Inter| Milan      | 2         | 1              |
+| Roma | Lazio      | 3         | 0              |
+| Napoli| Inter     | 1         | 1              |
+| Milan| Roma       | 0         | 2              |
+
+
+## Relationship 
+

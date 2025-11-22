@@ -1,0 +1,268 @@
+/* Import google fonts */
+/* @import url('https://fonts.googleapis.com/css?family=Lora|Open+Sans&display=swap'); */
+
+/*-- scss:rules --*/
+
+/* Slide: change font */
+slides > slide {
+  font-family: 'Source Sans Pro', sans-serif;
+  overflow-x: auto !important;
+  overflow-y: auto !important;
+}
+
+/* Slide: text color black */
+slides > slide > article {
+  color: black;
+  font-weight: 300;
+}
+
+/* Slide: transition slides white */
+slides > slide.dark {
+  background-color: white !important;
+}
+
+/* Header: change color */
+h1 {
+  color: #003f5c !important;
+  position: relative;
+  padding-bottom: 10px;
+}
+
+h1::after {
+  content: "";
+  display: block;
+  width: 50%; /* Lunghezza della linea */
+  height: 2px; /* Spessore della linea */
+  background-color: grey;
+  margin: 10px auto 0; /* Margine superiore per separarla dal titolo */
+}
+
+h2 {
+  color: #003f5c !important;
+}
+
+/* Header: underline section slides */
+.auto-fadein {
+  width: 70%;
+}
+.auto-fadein > h1 {
+  border-bottom: 2px solid grey;
+  padding-bottom: 10px;
+}
+.auto-fadein > h2 {
+  border-bottom: 2px solid grey;
+  padding-bottom: 10px;
+}
+
+/* Citations: colored */
+.cite {
+  color: #2b7ddf;
+}
+
+/* Center Images */
+img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 25px;
+  max-width: 100%;
+}
+
+/* Unordered list style */
+ul > li:before {
+  content: '';
+}
+ul > li {
+  list-style-type: disc;
+}
+ul > li > ul > li:before {
+  content: '';
+}
+ul > li > ul > li {
+  list-style-type: circle;
+}
+
+/* Code */
+pre {
+  width: auto !important;
+  left: 0px !important;
+  padding: 10px 20px 10px 20px !important;
+  border-radius: 5px !important;
+  border-color: #adb5bd !important;
+  border-width: thin !important;
+  border-style: solid !important;
+}
+
+pre.prettyprint {
+  background-color: #f8f8f8 !important;
+}
+
+/* Table */
+table.rmdtable {
+  width: auto !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  margin-bottom: 25px;
+  border-bottom: none !important;
+  border-spacing: 0px !important;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+}
+
+table.rmdtable th {
+  background: none !important;
+  background-color: #003f5c !important;
+  padding: 10px;
+  text-align: center !important;
+}
+
+table.rmdtable td, table th {
+  padding: 1em 1em !important;
+}
+
+/* Round borders */
+table.rmdtable th:first-child {
+  border-radius: 5px 0 0 0;
+}
+table.rmdtable th:last-child {
+  border-radius: 0 5px 0 0;
+}
+
+table.rmdtable tr:last-child td:first-child {
+  border-radius: 0 0 0 5px;
+}
+table.rmdtable tr:last-child td:last-child {
+  border-radius: 0 0 5px 0;
+}
+
+/* Table Hover */
+table.rmdtable > tbody > tr:hover > td,
+table.rmdtable > tbody > tr:hover > th {
+  background-color: #e5e5e5;
+}
+
+h2::after {
+  content: "";
+  display: block;
+  width: 75%;
+  height: 4px; 
+  margin: 10px 0 0; /* Add spacing below the title */
+  background: repeating-linear-gradient(
+    to right,
+    #79A22E 0,
+    #79A22E 25%,
+    #E09900 25%,
+    #E09900 50%,
+    #961E46 50%,
+    #961E46 75%,
+    #1A75BB 75%,
+    #1A75BB 100%
+  ); 
+  border-radius: 0;
+}
+
+#title-slide h1 {
+  font-size: 1.5em;
+}
+
+#title-slide h2 {
+  font-size: 1.2em;
+}
+
+#title-slide h1::after {
+  content: "";
+  display: block;
+  width: 75%;
+  height: 4px;
+  margin: 10px auto 0; /* Center the bar horizontally */
+  background: repeating-linear-gradient(
+    to right,
+    #79A22E 0,
+    #79A22E 25%,
+    #E09900 25%,
+    #E09900 50%,
+    #961E46 50%,
+    #961E46 75%,
+    #1A75BB 75%,
+    #1A75BB 100%
+  );
+  border-radius: 0;
+}
+
+/* Tabelle in stile LaTeX / booktabs */
+.reveal table {
+  font-size: 70%;
+  width: auto;
+  margin: 0 auto;
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+/* Rimuove i bordi verticali */
+.reveal table th,
+.reveal table td {
+  border: none !important;
+  padding: 4px 10px;
+  text-align: center;
+}
+
+/* Linea superiore (toprule) */
+.reveal table thead tr:first-child th {
+  border-top: 1.5px solid #000 !important;
+}
+
+/* Linea sotto l'header (midrule) */
+.reveal table thead tr:last-child th {
+  border-bottom: 1.2px solid #000 !important;
+}
+
+/* Linea inferiore finale (bottomrule) */
+.reveal table tbody tr:last-child td {
+  border-bottom: 1.5px solid #000 !important;
+}
+
+/* Nessuno sfondo grigio */
+.reveal table th {
+  background: none !important;
+  font-weight: bold;
+}
+
+/* Righe più compatte */
+.reveal table tbody tr td {
+  padding-top: 3px;
+  padding-bottom: 3px;
+}
+
+
+/* Flex centering for Idea slide */
+.idea-flex {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: 1.2rem;
+  padding: 0 5%;
+}
+
+/* logo unts e area */
+
+/*
+.reveal .slide-background::after {
+  content: "";
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  height: 10%;
+  display: flex;
+  z-index: 10;
+  pointer-events: none;
+
+  background-image: url('images/loghi.jpg');
+  background-size: contain; 
+  background-repeat: no-repeat;
+  background-position: right; 
+  width: 25%; 
+}
+*/
