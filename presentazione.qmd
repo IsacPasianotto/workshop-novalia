@@ -427,3 +427,8 @@ Una tabella è una relazione se:
 
 ## Relationship 
 
+Collegamento logico tra entità di tabelle diverse.
+
+\
+
+![](./img/relationship.png){width="80%" style="display: block; margin-left: auto; margin-right: auto;"}
