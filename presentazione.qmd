@@ -7,6 +7,7 @@ format:
   revealjs:
     footer: "Isac Pasianotto - 13/12/2025"
     theme: ./mytheme.css
+    # theme: [dracula, mytheme.css]
     transition: slide
     scrollable: true
     smaller: false
@@ -15,7 +16,7 @@ format:
     toc-title: "Agenda"
     slide-number: true
     self-contained: true
-    pdf-separate-fragments: false
+    pdf-separate-fragments: true
     notes: false
     code-line-numbers: false
 ---
@@ -263,7 +264,7 @@ La logica del programma è indipentende dalla gestione dei dati!
 
 ---
 
-# Modello relazionale
+# Modello Relazionale 
 
 ## Schema logico relazionale:
 
@@ -417,12 +418,12 @@ Una tabella è una relazione se:
 \
 
 
-| Casa |  Trasferta | Goal Casa | Goal Trasferta |
-|------|------------|-----------|----------------|
-| Inter| Milan      | 2         | 1              |
-| Roma | Lazio      | 3         | 0              |
-| Napoli| Inter     | 1         | 1              |
-| Milan| Roma       | 0         | 2              |
+| Casa  |  Trasferta | Goal Casa | Goal Trasferta |
+|-------|------------|-----------|----------------|
+| Inter | Milan      | 2         | 1              |
+| Roma  | Lazio      | 3         | 0              |
+| Napoli| Inter      | 1         | 1              |
+| Milan | Roma       | 0         | 2              |
 
 
 ## Relationship 
@@ -432,3 +433,548 @@ Collegamento logico tra entità di tabelle diverse.
 \
 
 ![](./img/relationship.png){width="80%" style="display: block; margin-left: auto; margin-right: auto;"}
+
+## Modello relazionale - concetti base
+
+::: {.fragment .fade-in}
+::: {.callout-note title="Vincoli di integrità"}
+Regole che garantiscono la correttezza e la coerenza dei dati all'interno di un database relazionale, possono essere:
+- Vincoli di dominio
+- Vincoli di n-upla
+- Vincoli referenziali
+:::
+:::
+
+::: {.fragment .fade-in}
+::: {.callout-note title="Chiave primaria"}
+Attributo o insieme di attributi che identificano univocamente una tupla all'interno di una relazione.
+:::
+:::
+
+::: {.fragment .fade-in}
+::: {.callout-note title="Chiave esterna"}
+Attributo o insieme di attributi in una relazione che fa riferimento alla chiave primaria di un'altra relazione, stabilendo un collegamento tra le due tabelle.
+:::
+:::
+
+
+## SQL - Structured Query Language
+
+Metalinguaggio standard per la gestione e manipolazione di database relazionali.
+
+::: {.fragment .incremental .fade-in style="font-size: 80%;"}
+- Linguaggio dichiarativo: si specifica *cosa* si vuole ottenere, non *come* ottenerlo[^1].
+- consente di:
+  - Definire strutture di dati (DDL)
+  - Manipolare dati (DML)
+  - Controllare l'accesso ai dati (DCL)
+
+[^1]: Ma avere idea di che succede sotto il cofano aiuta molto! E.g., ottimizzazione delle query studiando il QEP (Query Execution Plan).
+:::
+
+## SQL - Esempio
+
+```sql
+SELECT
+    c.name,
+    SUM(o.amount) AS total_spent
+FROM customers c
+JOIN orders o ON o.customer_id = c.id
+WHERE o.order_date >= CURRENT_DATE - INTERVAL '30 days'
+GROUP BY c.name
+HAVING SUM(o.amount) > 500
+ORDER BY total_spent DESC;
+```
+
+## Transizioni
+
+::: {.fragment .incremental .fade-in style="font-size: 80%;"}
+
+- Transazioni: unità logica di lavoro che può comprendere una o più operazioni di database.
+- Vengono usate quando è necessario garantire che un insieme di operazioni vengano eseguite in modo atomico.
+- Il risultato di una transazione deve essere tale che il database rimanga in uno stato consistente
+- Vuol dire che *tutte* le operazioni della transazione vengono completate con successo, o *nessuna* viene applicata (proprietà ACID).
+:::
+
+
+## Transazione - esempio
+
+```sql
+start transaction;
+
+select @orderNumber := max(orderNUmber) from orders;
+set @orderNumber = @orderNumber + 1;
+set @cnumber = 103;
+
+insert into orders(orderNumber, orderDate, requiredDate,
+         shippedDate, status, customerNumber)
+values(@orderNumber, now(), date_add(now(), INTERVAL 5 DAY),
+date_add(now(), INTERVAL 2 DAY), 'In Process', @cnumber);
+
+insert into orderdetails(orderNumber, productCode,
+              quantityOrdered, priceEach, orderLineNumber)
+values(@orderNumber,'S18_1749', 30, '136', 1),
+(@orderNumber,'S18_2248', 50, '55.09', 2);
+
+commit;
+```
+
+## ACID: le transazioni in un db relazionale
+
+::: {.fragment .incremental .fade-in style="font-size: 80%;"}
+Ogni transazione in un DBMS relazionale deve rispettare le proprietà ACID:
+:::
+
+::: {.fragment .fade-in style="font-size: 80%;"}
+::: {.callout-tip title="A - Atomicity (Atomicità)"}
+Tutte le operazioni all'interno di una transazione devono essere completate con successo affinché la transazione sia considerata completata. Se una qualsiasi operazione fallisce, l'intera transazione deve essere annullata (rollback).
+:::
+:::
+
+::: {.fragment .fade-in style="font-size: 80%;"}
+::: {.callout-tip title="C - Consistency (Consistenza)"}
+Una transazione deve portare il database da uno stato consistente a un altro stato consistente, rispettando tutte le regole di integrità definite nel database.
+:::
+:::
+
+## ACID: le transazioni in un db relazionale 
+
+::: {.callout-tip title="I - Isolation (Isolamento)"}
+Le operazioni di una transazione devono essere isolate dalle operazioni di altre transazioni in esecuzione contemporaneamente, in modo che il risultato finale sia lo stesso come se le transazioni fossero eseguite in sequenza.
+:::
+
+
+::: {.fragment .fade-in style="font-size: 80%;"}
+::: {.callout-tip title="D - Durability (Durabilità)"}
+Una volta che una transazione è stata completata con successo, le modifiche apportate al database devono essere permanenti, anche in caso di guasti di sistema.
+:::
+:::
+
+# No-SQL
+
+## Cenni storici
+
+::: {.fragment .incremental .fade-in style="font-size: 80%;"}
+- **1970**: Edgar F. Codd pubblica il modello relazionale.
+- **anni 80**: diffusione dei DB relazionali *commerciali*:  Oracle(1979), IBM DB2 (1983), Microsoft SQL Server (1989) ...
+- **anni 90**: primi DB relazionali *open-source*: MySQL (1995), PostgreSQL (1996) ...
+:::
+
+::: {.fragment .incremental .fade-in style="font-size: 80%;"}
+Andava tutto bene...
+:::
+
+
+::: {.fragment .fade-in style="font-size: 80%;"}
+SQL per molit anni è stato lo standard de facto per la gestione dei dati.
+:::
+
+## No-SQL: la nascita
+
+::: {.fragment .fade-in style="font-size: 80%;"}
+Nel tempo le esigenze di gestione dei dati sono cambiate:
+:::
+
+::: {.fragment .incremental .fade-in style="font-size: 80%;"}
+- Grandi volumi di dati da gestire (Big Data)
+- Necessità di scalabilità orizzontale
+- Struttura dei dati troppo rigida per determinati domini applicativi
+:::
+
+::: {.fragment .fade-in style="font-size: 80%;"}
+I database No-SQL nascono per rispondere a queste nuove esigenze.
+:::
+
+## No-SQL DB:
+
+::: {.callout-note title='“No-SQL”'}
+No-SQL: **Not Only SQL**; termine ombrello usato per descrivere una varietà di sistemi di gestione dei dati non relazionali.
+:::
+
+::: {.fragment .incremental .fade-in style="font-size: 80%;"}
+- Termine nato nel 1998 da Carlo Strozzi per indicare un DBMS che non utilizzava SQL.
+- Diventato popolare nel 2009, a seguito di un evento organizzato da Johan Oskarsson.
+- Oggi racchiude una vasta gamma di tecnologie di database la cui unica caratteristica comune è quella di non essere basate sul modello relazionale.
+:::
+
+## BASE: l'alternativa al paradigma ACID
+
+::: {.fragment .incremental .fade-in style="font-size: 80%;"}
+Le transazioni nei DB No-SQL spesso seguono il paradigma BASE:
+:::
+
+::: {.fragment .fade-in style="font-size: 80%;"}
+::: {.callout-tip title="BA - Basically Available"}
+Il sistema garantisce la disponibilità dei dati, anche in caso di guasti o partizioni di rete.
+:::
+:::
+
+::: {.fragment .fade-in style="font-size: 80%;"}
+::: {.callout-tip title="S - Soft state"}
+Il sistema non garantisce che lo stato dei dati sia sempre consistente, ma può essere in uno stato intermedio; questo implica che il sistema possa modificare lo stato dei dati nel tempo, anche senza input esterni.
+:::
+:::
+
+::: {.fragment .fade-in style="font-size: 80%;"}
+::: {.callout-tip title="E - Eventual consistency"}
+Il sistema garantisce che alla fine, prima o poi, tutti i nodi del sistema convergeranno verso uno stato consistente.
+:::
+:::
+
+## Tipi di database No-SQL
+
+::: {.fragment .fade-in style="font-size: 80%;"}
+Come già anticipato i DB No-SQL sono estremamente eterogenei, e classificarli in delle categorie non è semplice.
+
+Generalmente vengono proposte le seguenti categorie basate sul modello di dati utilizzato:
+:::
+
+<!-- ::: {.fragment .incremental .fade-in style="font-size: 80%;"}
+- ***a. Key-Value***  (e.g., ETCD, Amazon DynamoDB)
+- ***b. Document-based*** (e.g., MongoDB, CouchDB)
+- ***c. Column-family*** (e.g, QuestDB, Cassandra, Bigtable)
+- ***d. Graph-based*** (e.g., Neo4j, Amazon Neptune)
+- ***e. In memory*** (e.g., Redis, Memcached)
+::: -->
+
+<table style="font-size:90%; width:100%;">
+  <tr class="fragment fade-in">
+    <td style="text-align:left;   width:10%;">a.</td>
+    <td style="text-align:left;   width:35%;">Key-Value</td>
+    <td style="text-align:right;  width:55%;">ETCD, Amazon DynamoDB</td>
+  </tr>
+
+  <tr class="fragment fade-in">
+    <td style="text-align:left;">b.</td>
+    <td style="text-align:left;">Document-based</td>
+    <td style="text-align:right;">MongoDB, CouchDB</td>
+  </tr>
+
+  <tr class="fragment fade-in">
+    <td style="text-align:left;">c.</td>
+    <td style="text-align:left;">Column-family</td>
+    <td style="text-align:right;">QuestDB, Cassandra, Bigtable</td>
+  </tr>
+
+  <tr class="fragment fade-in">
+    <td style="text-align:left;">d.</td>
+    <td style="text-align:left;">Graph-based</td>
+    <td style="text-align:right;">Neo4j, Amazon Neptune</td>
+  </tr>
+
+  <tr class="fragment fade-in">
+    <td style="text-align:left;">e.</td>
+    <td style="text-align:left;">In-memory</td>
+    <td style="text-align:right;">Redis, Memcached</td>
+  </tr>
+</table>
+
+
+## a. Key-Value DB
+
+::: {.fragment .incremental .fade-in style="font-size: 80%;"}
+Una unica tabella di due colonne:
+
+- **Key**: identificatore univoco per ogni elemento.
+- **Value**: dato associato alla chiave, può essere di qualsiasi tipo (stringa, numero, oggetto complesso, ...).
+:::
+
+::: {.fragment .incremental .fade-in style="font-size: 80%;"}
+Esempio di operazioni:
+
+- PUT(key, value): inserisce o aggiorna il valore associato alla chiave.
+- GET(key): recupera il valore associato alla chiave.
+- DELETE(key): rimuove la coppia chiave-valore.
+:::
+
+## a. Key-Value DB 
+
+::: {.fragment .incremental .fade-in style="font-size: 80%;"}
+- Vantaggi: 
+  - Estremamente efficienti per operazioni di lettura/scrittura semplici.
+  - Facilità di gestione 
+  - Scalabilità orizzontale
+- Svantaggi:
+  - Non adatti a dati complessi 
+  - Mancanza di funzionalità avanzate per query complesse
+:::
+
+## b. Document-based DB
+
+::: {.columns}
+:::: {.column width="50%"}
+
+
+\
+
+\ 
+
+![](./img/document-db.png){.fragment width="100%"}
+
+::::
+:::: {.column width="50%"}
+
+::: {.fragment .incremental .fade-in style="font-size: 75%;"}
+Simili ai Key-Value, ma il valore è un documento (JSON, ma anche XML, BSON, ...).
+:::
+
+::: {.fragment .incremental .fade-in style="font-size: 75%;"}
+Esempio di operazioni:
+
+- INSERT(document): inserisce un nuovo documento.
+- FIND(query): recupera documenti che soddisfano una query.
+- UPDATE(query, update): aggiorna documenti che soddisfano una query.
+- DELETE(query): rimuove documenti che soddisfano una query.
+:::
+::::
+:::
+
+
+
+## b. Document-based DB: example
+
+::: {.columns}
+::: {.column width="50%"}
+::: {style="font-size:70%;"}
+
+```js
+use shop;
+
+db.utenti.insertOne({
+  nome: "Luca",
+  cognome: "Rossi",
+  eta: 30,
+  indirizzo: {
+    via: "Via Roma 10",
+    città: "Milano",
+    cap: "20100" 
+  },
+  interessi: ["calcio", 
+      "programmazione", "musica"],
+  ordini: [
+    { prodotto: "Laptop",
+      prezzo: 1200,
+      data: new Date("2025-09-15") 
+    },
+    { prodotto: "Mouse", 
+      prezzo: 40, 
+      data: new Date("2025-12-05") 
+    } 
+  ] 
+});
+```
+:::
+:::
+
+::: {.column width="50%"}
+::: {style="font-size:70%;"}
+```bash
+mongoimport --db shop \
+  --collection utenti \
+  --file utente.json \
+  --jsonArray
+```
+
+\ 
+
+"Tutti i clienti che hanno ordinato almeno 2 volte il prodotto 'Laptop' dopo il 1° gennaio 2025"
+```js
+db.clienti.find({
+  ordini: {
+    $elemMatch: {
+      prodotto: "Laptop",
+      quantita: { $gte: 2 },
+      data_ordine: { 
+        $gt: new Date("2025-01-01") 
+      }
+    }
+  }
+});
+```
+:::
+
+:::
+:::
+
+## b. Document-based DB 
+
+::: {.fragment .incremental .fade-in style="font-size: 80%;"}
+- Vantaggi:
+  - *Schema-less*: flessibilità nelllo schema dei dati
+  - Adatto a dati semi/non strutturati, con strutture non uniformi
+  - Supporto a query anche molto complesse sui documenti
+- Svantaggi:
+  - Tendenza alla duplicazione dei dati
+  - Performance possono degradare con aggregazioni complesse (e inferiori ai key-value su oggetti semplici)
+:::
+
+## c. Column-family DB
+
+::: {.columns}
+:::: {.column width="50%"}
+
+\
+
+![](./img/col-db.png){width="100%"}
+::::
+
+:::: {.column width="50%"}
+
+::: {.fragment .incremental .fade-in style="font-size: 75%;"}
+- Simili ai DB relazionali, ma i dati sono organizzati in famiglie di colonne piuttosto che in righe.
+- I dati vengono salvati per (famiglie di ) colonna
+:::
+
+::: {.fragment .fade-in style="font-size: 75%;"}
+Supporta le normali operazioni CRUD (Create, Read, Update, Delete) e query (moderatamente) complesse.
+:::
+
+::::
+:::
+
+## c. Column-family DB
+
+::: {.fragment .incremental .fade-in style="font-size: 80%;"}
+- Vantaggi:
+  - Ottimizzati per query su insiemi di colonne specifiche.
+  - Grande scalabilità orizzontale
+  - Archiviazione efficiente di dati sparsi e per timeseries
+- Svantaggi:
+  - Complessità nella progettazione iniziale dello schema
+  - Scarsa flessibilità per tutto ciò che va oltre a le operazioni previste in fase di progettazione
+  - Se i dati sono altamente relazionati, meglio un db relazionale
+:::
+
+## d. Graph-based DB
+
+::: {.fragment .incremental .fade-in style="font-size: 75%;"}
+- I dati sono organizzati come **nodi** (entità) e **archi** (relazioni) che li collegano.
+- Ogni nodo e arco può avere proprietà associate.
+- Ottimizzati per interrogare e navigare relazioni complesse tra entità.
+:::
+::: {.fragment .fade-in style="font-size: 75%;"}
+Esempio di operazioni:
+
+- CREATE (node): crea un nuovo nodo.
+- MATCH (pattern): trova nodi/relazioni che soddisfano un pattern.
+- CREATE (node1)-[relation]->(node2): crea una relazione tra nodi.
+:::
+
+
+## d. Graph-based DB: example
+::: {.columns}
+::: {.column width="50%"}
+::: {style="font-size:65%;"}
+```cypher
+// Creazione di nodi
+CREATE (luca:Persona {
+  nome: "Luca", 
+  età: 30
+})
+CREATE (maria:Persona {
+  nome: "Maria", 
+  età: 28
+})
+CREATE (pizza:Ristorante {
+  nome: "Pizzeria Da Gino", 
+  cucina: "Italiana"
+})
+
+// Creazione di relazioni
+CREATE (luca)-[:AMICO_DI]->(maria)
+CREATE (luca)-[:HA_VISITATO {
+  data: "2025-11-20"
+}]->(pizza)
+CREATE (maria)-[:LAVORA_IN]->(pizza)
+```
+:::
+:::
+::: {.column width="50%"}
+::: {style="font-size:65%;"}
+```cypher
+// Query: "Trova tutti gli amici 
+// degli amici di Luca"
+
+MATCH (luca:Persona {nome: "Luca"})
+      -[:AMICO_DI]->(:Persona)
+      -[:AMICO_DI]->(amico)
+RETURN amico.nome
+
+// Query: "Trova ristoranti visitati 
+// da amici di Luca dove lavorano 
+// altri suoi amici"
+
+MATCH (luca:Persona {nome: "Luca"})
+      -[:AMICO_DI]->(amico)
+      -[:HA_VISITATO]->(ristorante)
+      <-[:LAVORA_IN]-(collega)
+      <-[:AMICO_DI]-(luca)
+RETURN DISTINCT ristorante.nome, 
+       collega.nome
+```
+:::
+:::
+:::
+
+## d. Graph-based DB
+::: {.fragment .incremental .fade-in style="font-size: 80%;"}
+- Vantaggi:
+  - Eccellenti per dati altamente interconnessi (social network, recommendation systems, fraud detection)
+  - Query su relazioni multi-livello molto efficienti
+  - Schema flessibile: facile aggiungere nuove relazioni
+- Svantaggi:
+  - Non ottimali per operazioni analitiche su grandi volumi di dati
+  - Curva di apprendimento più ripida (linguaggi specifici come Cypher)
+:::
+
+## e. In-memory DB
+
+::: {.fragment .incremental .fade-in style="font-size: 80%;"}
+- Implementazione di uno dei modelli di dati precedenti (key-value, document-based, ...)
+- La differenza è che **i dati sono memorizzati nella memoria pirncipale (RAM)** anziché su archiviazione
+- I dati sono volatili: si perdono in caso di spegnimento del sistema
+- Alcune implementazioni offrono anche meccanismi di persistenza
+:::
+
+## e. In-memory DB
+::: {.fragment .incremental .fade-in style="font-size: 80%;"}
+- Vantaggi:
+  - Velocità di accesso ai dati estremamente elevata
+  - Ottimali per applicazioni che richiedono bassa latenza (caching, session management, real-time analytics)
+- Svantaggi:
+  - Limitazioni di capacità legate alla quantità di RAM disponibile
+  - Non adatti per dati che richiedono persistenza a lungo termine senza meccanismi di backup
+:::
+
+## Quale strumento scegliere?
+
+::: {.columns}
+:::: {.column  width="50%"}
+::: {.fragment .fade-in }
+
+![](./img/minecraft-piccone.png){width="35%" style="display: block; margin-left: auto; margin-right: auto;"}
+
+\ 
+
+\
+
+
+
+![](./img/minecraft-spada.webp){width="35%" style="display: block; margin-left: auto; margin-right: auto;"}
+:::
+::::
+
+:::: {.column  width="50%"}
+
+::: {.fragment .fade-in }
+![](./img/minecraft-diamante.png){width="30%" style="display: block; margin-left: auto; margin-right: auto;"}
+
+\
+
+![](./img/minecraft-zombie.png){width="30%" style="display: block; margin-left: auto; margin-right: auto;"}
+:::
+::::
+
+:::
+
+## 
