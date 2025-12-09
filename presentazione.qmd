@@ -457,6 +457,30 @@ Attributo o insieme di attributi in una relazione che fa riferimento alla chiave
 :::
 :::
 
+## Chiavi: definizioni
+
+::: {.fragment .fade-in style="font-size: 80%;"}
+::: {.callout-note title="***Def.*** Superchiave"}
+Sia $K$ insieme di attributi di una relazione $R$: 
+$k \in K,\ = (d_1^k, d_2^k, \dots, d_n^k) \subseteq R$.
+
+$K$ è una **superchiave** per $R$ se $\forall t_1, t_2 \in R : t_1 \neq t_2 \Rightarrow t_1[K] \neq t_2[K]$. 
+
+"Non esistono due tuple distinte che abbiano gli stessi valori per gli attributi in $K$."
+:::
+:::
+
+::: {.fragment .fade-in style="font-size: 80%;"}
+::: {.callout-note title="***Def.*** Superchiave minimale"}
+Sia $K$ una superchiave per $R$.
+
+$K$ è una **superchiave minimale o candidata** per $R$ se $\nexists K^* \subset K$ tale che $K^*$ sia una superchiave per $R$.
+:::
+:::
+
+::: {.fragment .fade-in style="font-size: 80%;"}
+La **chiavi primaria** è **una fra le possibili superchiavi minimali**, scelta per identificare univocamente le tuple di una relazione.
+:::
 
 ## SQL - Structured Query Language
 
@@ -946,6 +970,8 @@ RETURN DISTINCT ristorante.nome,
   - Non adatti per dati che richiedono persistenza a lungo termine senza meccanismi di backup
 :::
 
+# Database a confronto
+
 ## Quale strumento scegliere?
 
 ::: {.columns}
@@ -977,4 +1003,232 @@ RETURN DISTINCT ristorante.nome,
 
 :::
 
-## 
+## Quale strumento scegliere? 
+
+::: {.fragment .incremental .fade-in style="font-size: 80%;"}
+- Non esiste una soluzione migliore sempre per tutti i casi.
+- Ci sono casi in cui un DB relazionale è la scelta migliore, altri in cui un DB No-SQL è più adatto.
+- Occorre valutare attentamente i requisiti dell'applicazione e scegliere il miglior trade-off tra vantaggi e svantaggi di ciascuna soluzione.
+:::
+
+## Il concetto di scalabilità:
+
+::: {.r-stack .fade-in}
+![](img/scalabilita-no-scale.png){.fragment width="100%"}
+
+![](img/scalabilita-verticale.png){.fragment width="100%"}
+
+![](img/scalabilita-orizzontale.png){.fragment width="100%"}
+:::
+
+## Il concetto di scalabilità:
+
+::: {.fragment .incremental .fade-in style="font-size: 80%;"}
+- **Scalabilità verticale**: aumentare le risorse (CPU, RAM, storage) di un singolo nodo/server:
+    - Più semplice da implementare
+    - Costi più elevati a lungo termine
+    - Limiti fisici delle risorse hardware
+- **Scalabilità orizzontale**: aggiungere più nodi/server al sistema, distribuendo il carico di lavoro tra di essi.
+    - Maggiore flessibilità, ma introduce complessità nella gestione
+    - Può essere più economico di scalare in verticale
+    - Limitazioni legate alle performance di rete
+:::
+
+## Come scalano i DB?
+
+::: {.fragment .incremental .fade-in style="font-size: 80%;"}
+- DB relazionali: 
+   - Scalbilità verticale ottima: aggiunggendo risorse ad un singolo nodo si ottengono buone performance.
+   - Scalare su più nodi è complesso, richiede tecniche come sharding e replica e non porta a vantaggi in perfomance (ma può aiutare in disponibilità e tolleranza ai guasti).
+- No-Sql:
+   - La maggiorparte sono progettati per scalare orizzontalmente in modo nativo.
+   - Non è garantito che scalino altrettanto bene in verticale.
+:::
+
+## Consistenza, disponibilità e tolleranza alle partizioni
+
+::: {.fragment .incremental .fade-in style="font-size: 80%;"}
+In un contesto distribuito:
+
+- ***Consistenza***:  (***C*** - Consistency) tutti i nodi hanno la stessa copia dei dati in ogni momento.
+  - I dati saranno sempre aggiornati e coerenti.
+  - Qualsiasi sia il server che risponde ad una richiesta, oterrò la medesima risposta.
+:::
+
+## Consistenza, disponibilità e tolleranza alle partizioni
+
+::: {.fragment .incremental .fade-in style="font-size: 80%;"}
+In un contesto distribuito:
+
+- ***Disponibilità***:  (***A*** - Availability) ogni richiesta riceve sempre una risposta, anche in caso di guasti di uno o più nodi.
+  - Il sistema è sempre operativo e risponde alle richieste.
+  - La risposta può anche essere un errore, ma non ci saranno mai timeout.
+
+:::
+
+## Consistenza, disponibilità e tolleranza alle partizioni
+
+::: {.fragment .incremental .fade-in style="font-size: 80%;"}
+In un contesto distribuito:
+
+- ***Tolleranza alle partizioni***:  (***P*** - Partition Tolerance) Il sistema continua a funzionare correttamente anche in caso di problemi di comunicazione o guasti di alcuni nodi.
+  - Il sistema deve poter prevenire problemi di *split-brain*.
+  - Nodi isolati devono sapere se sono isolati e agire di conseguenza.
+:::
+
+## CAP theorem
+
+::: {.callout-note title="Teorema di Brewer (CAP Theorem)"}
+In un sistema distribuito, si possono garantire *al massimo due* delle seguenti proprietà contemporaneamente: 
+
+- Consistenza (C)
+- Disponibilità (A)
+- Tolleranza alle partizioni (P)
+:::
+
+
+## CA: Consistenza + Disponibilità
+
+::: {.columns}
+
+:::: {.column width="50%"}
+::: {.fragment .incremental .fade-in }
+Il sistema risponde sempre alle richieste e garantisce che le risposte siano sempre consistenti. 
+
+Esempio: database relazionali tradizionali in singolo nodo.
+:::
+::::
+
+:::: {.column width="50%"}
+
+\ 
+
+\ 
+
+![](img/cap-ca.png){width="100%"}
+::::
+:::
+
+
+## CP: Consistenza + Tolleranza alle partizioni
+
+::: {.columns}
+:::: {.column width="50%"}
+::: {.fragment .incremental .fade-in }
+Il sistema garantisce che i dati siano sempre consistenti e tollera le partizioni di rete, al costo di una possibile riduzione della disponibilità.
+
+Esempi:
+ - DB relazioali diponibili (e.g, HA PostgreSQL)
+ - MongoDB, Redis, ....
+
+:::
+::::
+:::: {.column width="50%"}
+
+\
+
+![](img/cap-cp.png){width="100%"}
+::::
+:::
+
+## AP: Disponibilità + Tolleranza alle partizioni
+
+::: {.columns}
+:::: {.column width="50%"}
+::: {.fragment .incremental .fade-in }
+Il sistema è sempre disponibile e tollera le partizioni di rete, ma non garantisce che i dati siano sempre consistenti.
+Generalmente implementano il paradigma BASE.
+
+Esempi:
+ - Cassandra, CouchDB, DynamoDB, ...
+:::
+::::
+:::: {.column width="50%"}
+
+\
+
+![](img/cap-ap.png){width="100%"}
+::::
+:::
+
+## Mole di dati 
+
+::: {.fragment .incremental .fade-in style="font-size: 80%;"}
+I database No-sql nascono per gestire grandi moli di dati, i famosi "Big Data".
+
+I Big Data sono caratterizzati dalle cosiddette 5 V:
+
+- Volume
+- Velocità
+- Varietà
+- Veridicità
+- Valore
+:::
+
+## Perhcè può essere un problema?
+
+::: {.fragment .fade-in style="font-size: 80%;"}
+- I db relazionali possono avere problemi di performance nel caso di grandi moli di dati o richieste ad alta velocità.
+:::
+
+
+::: {.fragment style="font-size: 50%;"}
+| Numero di righe (per tabella) | Stato del DB relazionale         | Cosa succede                                                                         | Perché diventa critico                                                                          |
+| ----------------------------: | -------------------------------- | ------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
+|  1M–10M | OK    | Performance accettabili con indici ben progettati                                    |                                                                     |
+|   10M–100M | Quasi OK         | Gli indici iniziano a pesare anche in RAM; query complesse degradano                 | Aumenta il costo di JOIN, VACUUM, aggiornamenti pesanti                                         |
+|  100M–1B | Ottimizzazioni necessarie | Anche con indici, le query full-table diventano lente; ingest rate limitato          | Locking, I/O bottleneck, crescita WAL, necessità di partizionamento                             |
+|  1B+ | Non OK        | Anche con tutte le ottimizzazioni, il modello relazionale fatica                     | Soglia dei "Big data", le performance si degradano          |
+| 10B+ | Modello non adatto        | Le operazioni diventano ingestibili in verticale; limiti strutturali del relazionale | Serve un DB distribuito progettato per throughput estremi (NoSQL, column-store, time-series DB, ...) |
+
+:::
+
+## Quindi, come scegliere?
+
+::: {.fragment .incremental .fade-in style="font-size: 80%;"}
+Ancora una volta, non esiste una risposta univoca.
+
+- A volte si è costretti a usare un DB relazionale per vincoli esterni (e.g., legacy systems, skill del team, ...)
+- A volte si sceglie un DB No-SQL per esigenze specifiche (scalabilità, flessibilità, performance ...)
+- A volte i dati impongono l'uso di una soluzione piuttosto che un altra (e.g., dati non strutturati complessi da gestire in un DB relazionale)
+- Nessuno vieta ad un applicativo di usare più DBMS diversi per esigenze diverse (polyglot persistence)
+- Infine, la tecnologia evolve rapidamente: ciò che è vero oggi potrebbe non esserlo domani.
+:::
+
+## Esempio
+
+::: {.fragment .incremental .fade-in style="font-size: 80%;"}
+Necesità e vincoli:
+
+- Nessun vincolo legacy: si può scegliere liberamente
+- Dati strutturati, facilmente rappresentabili in tabelle
+- Volume di dati accettabile (previsti 20-40M di righe)
+- Requirements:
+  - Performance in insert ad alta frequeza
+  - Scalabilità orizzontale/verticale 
+:::
+
+## Esempio 
+
+![](img/questdb.png){width="80%" style="display: block; margin-left: auto; margin-right: auto;"}
+
+# Live demo 
+
+# E per tutti i dati che non stanno nel DB?
+
+## TODO, fare la parte su fs distribuiti 
+
+# Grazie per l'attenzione!
+  Domande?
+
+## Licenza d'uso di questo documento
+
+Questo documento è rilasciato sotto la licenza Creative Commons
+Attribuzione - Condividi allo stesso modo 4.0 Internazionale (CC BY-SA
+4.0).
+
+\
+
+Per leggere una copia della licenza, visita [https://creativecommons.org/licenses/by-sa/4.0/deed.it](https://creativecommons.org/licenses/by-sa/4.0/deed.it) o invia una lettera a Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+
+![](img/CCBYSA.png){width="0.05%" style="display: block; margin-left: auto; margin-right: auto;"}
