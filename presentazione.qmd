@@ -461,8 +461,8 @@ Attributo o insieme di attributi in una relazione che fa riferimento alla chiave
 
 ::: {.fragment .fade-in style="font-size: 80%;"}
 ::: {.callout-note title="***Def.*** Superchiave"}
-Sia $K$ insieme di attributi di una relazione $R$: 
-$k \in K,\ = (d_1^k, d_2^k, \dots, d_n^k) \subseteq R$.
+Sia $K$ insieme di attributi di una relazione $R$, ovvero: 
+$k \in K,\ k = (d_1^k, d_2^k, \dots, d_n^k) \subseteq R$.
 
 $K$ è una **superchiave** per $R$ se $\forall t_1, t_2 \in R : t_1 \neq t_2 \Rightarrow t_1[K] \neq t_2[K]$. 
 
@@ -522,26 +522,37 @@ ORDER BY total_spent DESC;
 
 
 ## Transazione - esempio
-
+::: {style="font-size:60%;"}
 ```sql
-start transaction;
-
-select @orderNumber := max(orderNUmber) from orders;
-set @orderNumber = @orderNumber + 1;
-set @cnumber = 103;
-
-insert into orders(orderNumber, orderDate, requiredDate,
-         shippedDate, status, customerNumber)
-values(@orderNumber, now(), date_add(now(), INTERVAL 5 DAY),
-date_add(now(), INTERVAL 2 DAY), 'In Process', @cnumber);
-
-insert into orderdetails(orderNumber, productCode,
-              quantityOrdered, priceEach, orderLineNumber)
-values(@orderNumber,'S18_1749', 30, '136', 1),
-(@orderNumber,'S18_2248', 50, '55.09', 2);
-
-commit;
+BEGIN; -- Inizio della transazione
+SET LOCAL my.beneficiario = '2001';    -- variabili di sessione
+SET LOCAL my.debitore = '3001';
+SET LOCAL my.n_prelievo = (SELECT MAX(id) + 1 FROM prelievi)::INT;
+SET LOCAL my.n_deposito = (SELECT MAX(id) + 1 FROM versamenti)::INT;
+SET LOCAL my.importo = '150.00'; 
+INSERT INTO prelievi(id, conto, importo, data_operazione)    --registrazione prelievo
+VALUES (
+    current_setting('my.n_prelievo')::INT,
+    current_setting('my.debitore')::INT,
+    current_setting('my.importo')::NUMERIC,
+    NOW()
+);
+INSERT INTO versamenti(id, conto, importo, data_operazione)    --registrazione deposito
+VALUES (
+    current_setting('my.n_deposito')::INT,
+    current_setting('my.beneficiario')::INT,
+    current_setting('my.importo')::NUMERIC,
+    NOW()
+);
+UPDATE saldo_clienti   -- aggiornamento saldi
+SET saldo = saldo + current_setting('my.importo')::NUMERIC
+WHERE conto = current_setting('my.beneficiario')::INT;
+UPDATE saldo_clienti
+SET saldo = saldo - current_setting('my.importo')::NUMERIC
+WHERE conto = current_setting('my.debitore')::INT;
+COMMIT; -- Fine della transazione
 ```
+:::
 
 ## ACID: le transazioni in un db relazionale
 
@@ -1216,7 +1227,437 @@ Necesità e vincoli:
 
 # E per tutti i dati che non stanno nel DB?
 
-## TODO, fare la parte su fs distribuiti 
+## Non tutti i dati stanno in un database
+
+::: {.fragment .incremental .fade-in style="font-size: 80%;"}
+I database  sono essenziali per molte applicazioni, ma in un qualsiasi sistema informatico esistono anche altri tipi di dati e informazioni che non sono memorizzati in esso:
+
+- Files:
+  - Codice sorgente/binari delle applicazioni
+  - Documentazione tecnica
+  - File di configurazione
+  - Log di sistema e applicazioni
+  - ...
+- Backup e snapshots
+- ...
+:::
+
+##  Storage
+
+::: {.fragment .fade-in style="font-size: 80%;"}
+::: {.callout-note title="***Def.*** Storage"}
+In ambito informatico con il termine storage si identificano
+
+- i dispositivi hardware
+- i supporti per la memorizzazione
+- le infrastrutture 
+- i software 
+
+dedicati alla memorizzazione non volatile di grandi quantità di informazioni in formato elettronico.
+:::
+:::
+
+
+::: {.fragment .fade-in style="font-size: 80%;"}
+::: {.callout-warning title="Nota"}
+Gli stessi file che servono al corretto funzionamento di un DBMS devono essere memorizzati e archiviati in un sistema di storage adeguato.
+:::
+:::
+
+
+## Storage: tipologie
+
+::: {.fragment .incremental .fade-in style="font-size: 80%;"}
+Possiamo classificare i sistemi di storage in alcune macro-categorie:
+
+- *Località*:
+  - ***DAS*** (Direct Attached Storage): locale
+  - ***NAS*** (Network Attached Storage): in rete, condiviso
+  - ***SAN*** (Storage Area Network): in rete ad alte prestazioni, con soluzioni dedicate
+- *Tipologia di archiviazione*:
+  - ***File-based storage***: memorizzazione basata su file system
+  - ***Block-based storage***: memorizzazione a blocchi
+  - ***Object-based storage***: memorizzazione basata su oggetti
+:::
+
+## Località: DAS
+
+::: {.fragment .incremental .fade-in style="font-size: 80%;"}
+
+I dispositivi di archiviazione (HDDs, SSDs, NVMes, ...) sono direttamente collegati al computer/server che li utilizza.
+
+- Vantaggi:
+  - Bassa latenza
+  - Semplicità di gestione
+- Svantaggi:
+  - Scalabilità orizzontale inesistente
+  - Limiti fisici alla capacità totale di archiviazione
+  - Mancanza di condivisione dei dati tra più sistemi
+  - SPOF (Single Point of Failure) per definizione
+:::
+
+## Località: NAS
+
+::: {.fragment .incremental .fade-in style="font-size: 80%;"}
+Un server di archiviazione dedicato è collegato alla rete e espone lo spazio di archiviazione come condivisione di rete (e.g., NFS, SMB/CIFS).
+
+- Vantaggi:
+  - Condivisione dei dati tra macchine diverse possibile
+  - Moderata facilità di gestione
+  - Costi inferiori rispetto a SAN
+- Svantaggi:
+  - Passando attraverso la rete, si introduce latenza
+  - Capacità totale di archiviazione da dividere tra più clients
+  - Rimane un singolo punto di guasto 
+:::
+
+## Località: SAN
+
+::: {.fragment .incremental .fade-in style="font-size: 80%;"}
+Un ***cluster*** di macchine dedicate all'archiviazione, solitamente collegate tramite reti ad alte prestazioni (e.g., Fibre Channel, infiniband, ISCSI, ...).
+
+- Vantaggi:
+  - Elevate performance in lettura/scrittura (spesso possibilità di parallelismo)
+  - Scalabilità orizzontale
+  - Alta disponibilità e tolleranza ai guasti
+  - Ridondanza dei dati su più nodi
+- Svantaggi:
+  - Costi elevati
+  - Maggiore complessità di gestione e manutenzione
+:::
+
+## Tipologia di archiviazione: File-based
+
+::: {.fragment .incremental .fade-in style="font-size: 80%;"}
+I dati sono memorizzati come file all'interno di un file system (e.g , ext4, NTFS, ZFS, ext4, APFS, ...).
+
+- Vantaggi:
+  - Semplicità di utilizzo e gestione
+  - Compatibilità con la maggior parte dei sistemi operativi
+- Svantaggi:
+  - Performance limitate per operazioni ad alta velocità
+  - Scalabilità orizzontale limitata
+:::
+
+## Filesy stem: definizione
+
+::: {.callout-note title="***Def.*** File System"}
+Un **file system** è una struttura logica e un insieme di regole utilizzate da un sistema operativo per organizzare, memorizzare e gestire i file su un dispositivo di archiviazione.
+
+La strruttura logica di un file system è generalmente ad albero o a grafo, con directory (cartelle) che contengono file e altre directory.
+
+Un file system gestisce anche i metadati associati ai file, come permessi di accesso, timestamp di creazione/modifica, dimensioni, ecc.
+:::
+
+## Tipologia di archiviazione: Block-based
+
+::: {.fragment .incremental .fade-in style="font-size: 80%;"}
+I dati sono memorizzati in blocchi di dimensioni fisse (e.g., 512 byte, 4 KB, ...), che possono essere letti o scritti indipendentemente.
+
+- Vantaggi:
+  - Elevate performance per operazioni di lettura/scrittura casuali
+  - Maggiore flessibilità nella gestione dello spazio di archiviazione
+- Svantaggi:
+  - Maggiore complessità di gestione
+  - Richiede software specifico per l'accesso ai dati
+  - Non direttamente montabile come un file system tradizionale
+:::
+
+## Tipologia di archiviazione: Object-based
+
+::: {.fragment .incremental .fade-in style="font-size: 80%;"}
+I dati sono memorizzati come oggetti, ciascuno con un identificatore univoco e metadati associati.
+- Vantaggi:
+  - Scalabilità orizzontale eccellente
+  - Adatto per grandi moli di dati non strutturati
+  - Facilità di integrazione con applicazioni cloud-native
+- Svantaggi:
+  - Performance inferiori per operazioni ad alta velocità rispetto a block-based storage
+  - Maggiore latenza nell'accesso ai dati
+  - Servono API specifiche per l'accesso agli oggetti
+  - Non direttamente montabile come un file system tradizionale
+:::
+
+## RAID
+
+::: {.fragment .incremental .fade-in style="font-size: 80%;"}
+::: {.callout-note title="***Def.*** RAID (Redundant Array of Independent/Inexpensive Disks)"}
+Tecnologia che combina più dischi rigidi in un'unica unità logica per migliorare le performance e/o la ridondanza dei dati.
+:::
+:::
+
+::: {.fragment .incremental .fade-in style="font-size: 80%;"}
+::: {.callout-warning title="Il RAID non è un backup!"}
+Un errore comune è pensare che avere un array RAID equivalga ad avere un backup dei dati.
+
+In realtà, il RAID protegge solo contro il guasto di uno o più dischi fisici, ma non protegge contro:
+- Guasti dell'intero sistema
+- Corruzione dei dati
+:::
+:::
+
+## Raid 0: Striping
+
+I dati sono suddivisi in blocchi e distribuiti equamente su tutti i dischi dell'array.
+
+::: {.columns}
+:::: {.column width="50%"}
+![](img/raid0.png){width="70%"}
+::::
+:::: {.column width="50%"}
+::: {.fragment .incremental .fade-in style="font-size: 80%;"}
+- Numero minimo di dischi: 2
+- Velocità in lettura e scrittura proporzionale al numero di dischi (fino a N×)
+- Capacità totale: somma delle capacità di tutti i dischi
+- Tolleranza ai guasti: nessuna (se un disco fallisce, si perdono tutti i dati)
+:::
+::::
+:::
+
+## Raid 1: Mirroring
+
+I dati sono duplicati identicamente su due o più dischi.
+
+::: {.columns}
+:::: {.column width="50%"}
+![](img/raid1.png){width="70%"}
+::::
+:::: {.column width="50%"}
+::: {.fragment .incremental .fade-in style="font-size: 80%;"}
+- Numero minimo di dischi: 2
+- Velocità di scrittura pari a quella di un singolo disco
+- Velocità di lettura fino a N volte più veloce (lettura parallela)
+- Capacità totale: capacità del disco più piccolo
+- Tolleranza ai guasti: può tollerare il guasto di N-1 dischi (basta che uno resti operativo)
+:::
+::::
+:::
+
+## Raid 5: Striping con parità distribuita
+
+I dati sono suddivisi in blocchi su tutti i dischi, con un blocco di parità distribuito.
+
+::: {.columns}
+:::: {.column width="50%"}
+![](img/raid5.png){width="100%"}
+::::
+:::: {.column width="50%"}
+::: {.fragment .incremental .fade-in style="font-size: 75%;"}
+- Numero minimo di dischi: 3
+- Lettura fino a (N-1)× più veloce
+- Scrittura più lenta a causa del calcolo e aggiornamento della parità
+- Capacità totale: somma delle capacità di tutti i dischi meno la capacità di un disco
+- Tolleranza ai guasti: può tollerare il guasto di un solo disco
+:::
+::::
+:::
+
+## Combinazioni delle precedenti
+
+È possibile combinare i livelli RAID per ottenere un compromesso tra performance e affidabilità.
+
+::: {.columns}
+:::: {.column width="50%"}
+![](img/raid0+1.png){width="100%"}
+::::
+:::: {.column width="50%"}
+::: {.fragment .incremental .fade-in style="font-size: 80%;"}
+Esempio: RAID 0+1 (striping + mirroring)
+
+- I dati sono suddivisi in blocchi e distribuiti su più dischi (RAID 0)  
+- L’intero array RAID 0 è poi duplicato su un secondo set di dischi (RAID 1)
+- Offrre perfornamce simili al RAID 0 con la ridondanza del RAID 1
+:::
+::::
+:::
+
+## RAID: serve davvero?
+
+::: {.fragment .incremental .fade-in style="font-size: 80%;"}
+- RAID può miglioare le performance e/o la ridondanza dei dati, ma non sostituisce una strategia di backup adeguata.
+- Con l'avvento di SSDs e NVMe, alcuni vantaggi del RAID (soprattutto in termini di performance) sono meno rilevanti.
+- In molti casi, soluzioni di storage moderne *SAN* offrono già ridondanza e performance elevate senza la necessità di configurare RAID a livello di singolo server.
+
+Se dovessi scegliere oggi, lo adotterei solo in contesti specifici: (NAS o DAS)
+:::
+
+## 3R da non dimenticare mai
+
+::: {.incremental .fade-in style="font-size: 80%;"}
+::: {.callout-note title="1. Replica"}
+La ***replica*** è la creazione di copie identiche dei dati su diversi disposiivi di storage
+:::
+:::
+
+::: {.incremental .fade-in style="font-size: 80%;"}
+::: {.callout-note title="2. Ridondanza"}
+La ***ridondanza*** è la duplicazione di componenti critici del sistema (dati, dischi, nodi, interfacce, alimentazioni, ecc.) per garantire la continuità operativa in caso di guasti.
+:::
+:::
+
+::: {.incremental .fade-in style="font-size: 80%;"}
+::: {.callout-note title="3. Resilienza"}
+La ***resilienza*** è la capacità del sistema di recuperare rapidamente da guasti o interruzioni, minimizzando l'impatto sui dati e sulle operazioni.
+
+Non è una tecnologia specifica, ma una proprietà emergente di un un sistema che incorpora replica e ridondanza.
+:::
+:::
+
+
+# Storage - alcuni esempi
+
+##
+
+::: {.fragment .incremental .fade-in}
+Analizziamo brevemente 3 soluzioni di storage molto diffuse:
+
+- **1. Local Storage**
+- **2. Rete aziendale con NFS**
+- **3. Ceph**
+
+:::
+
+
+## 1. Local Storage
+
+::: {.fragment .incremental .fade-in style="font-size: 70%;"}
+Scenario tipico: ogni dipendente ha una workstation aziendale con storage locale (HDD, SSD, ...).
+
+- Costi di gestione nulli
+- L'user non ha bisogno di connettività di rete per accedere ai propri dati
+- Performance di lettura/scrittura limitate solo dalla qualità dell'hardware utilizzato
+
+![](img/grid-users.png){.fragment width="50%" style="display: block; margin-left: auto; margin-right: auto;"}
+:::
+
+## 1. Local Storage
+
+::: {.fragment .incremental .fade-in style="font-size: 80%;"}
+
+- E se due utenti devono collaborare su uno stesso file?
+- E se l'utente perde il suo computer o si rompe?
+- E se l'utente dimentica di fare il backup dei suoi dati?
+- E se l'utente ha bisogno di accedere agli stessi dati da altri dispositivi? (Per es. da un server di calcolo a cui invia dei job)?
+
+:::
+
+:::  {.fragment .fade-in style="font-size: 80%;"}
+Alcuni problemi possono essere mitigati con soluzioni tampone (es. usare un server git) ma non risolvono i problemi alla radice.
+
+In generale si addossala responsabilità di prevenire data losses all'utente finale, il che non è mai una buona idea.
+:::
+
+
+## 2. Rete aziendale con NFS
+
+::: {.fragment .incremental .fade-in style="font-size: 70%;"}
+Scenario tipico: un server dedicato espone uno spazio di archiviazione condiviso tramite NFS (Network File System).
+
+- I dati sono centralizzati e accessibili da qualsiasi macchina connessa alla rete aziendale
+- Facilità di gestione e backup centralizzato
+- Occorre avere una buona connettività di rete per performance accettabili
+
+![](img/nfs.png){width="70%" style="display: block; margin-left: auto; margin-right: auto;"}
+:::
+
+## 2. Rete aziendale con NFS
+
+::: {.fragment .incremental .fade-in style="font-size: 80%;"}
+- Possibilità di collaborare a progetti da diverse workstation
+- Centralizzazione dei dati $\Rightarrow$ maggiore semplicità di backup
+- Il server NFS può implementare RAID o altre tecniche di ridondanza
+:::
+::: {.fragment .incremental .fade-in style="font-size: 80%;"}
+Tuttavia...
+
+- Rimane un singolo punto di guasto (SPOF)
+- Il server espone un file system montato dai client, nulla di più
+:::
+
+
+## 3. Ceph
+
+::: {.columns}
+
+:::: {.column width="50%"}
+
+::: {.fragment .incremental .fade-in style="font-size: 65%;"}
+- Software di storage distribuito open-source
+- Progettato per scalare orizzontalmente su cluster di server
+- Buone performance grazie alla parallelizzazione delle operazioni di I/O
+- Soluzione estremamente robusta e tollerante ai guasti, con meccanismi di replica e auto-riparazione
+- **Richiede una cluster di storage dedicato ed adeguato**
+- Decisamente meno banale da setuppare e gestire rispetto alle soluzioni precedenti, ma molto più potente e versatile
+:::
+
+::::
+:::: {.column width="50%"}
+![](img/ceph-logo.png){width="50%" style="display: block; margin-left: auto; margin-right: auto;"}
+
+\ 
+
+![](img/schema-ceph.png){width="75%"}
+
+::::
+:::
+
+## Ceph
+
+\
+
+![](img/schema-workstation-ceph.png){width="80%" style="display: block; margin-left: auto; margin-right: auto;"}
+
+## Ceph: internals
+
+![](img/ceph-internals.png){width="80%" style="display: block; margin-left: auto; margin-right: auto;"}
+
+## Ceph
+
+::: {.fragment .incremental .fade-in style="font-size: 80%;"}
+- Gli user possono accedere ai dati da qualsiasi macchina connessa alla rete aziendale
+- I dati sono distribuiti su più nodi di storage, permettendo parallelismi che migliorano le performance
+- Ceph grazie a `librados` può essere utilizzato sia come file system montato (CephFS) sia come object storage (RADOS) che come block storage (RBD)
+:::
+
+::: {.fragment .incremental .fade-in style="font-size: 80%;"}
+Tuttavia ...
+
+- Richiede una infrastruttura di storage dedicata e adeguata
+:::
+
+## Qualche considerazione
+
+::: {.fragment .fade-in style="font-size: 75%;"}
+Scegliere la soluzione di storage più adatta è come scegliere il database più adatto...
+:::
+
+::: {.fragment .fade-in style="font-size: 75%;"}
+
+\ 
+
+***Dipende dal contesto, dai requisiti e dai vincoli specifici dell'organizzazione o dell'applicazione in questione.***
+:::
+
+
+## Qualche considerazione 
+::: {.fragment .incremental .fade-in style="font-size: 75%;"}
+Alcuni aspetti (non approfonditi) da considerare:
+
+- Sicurezza dei dati (crittografia, access control, ...)
+- Compliance normativa (GDPR, HIPAA, ...)
+- Costi di gestione e manutenzione
+- Facilità di integrazione con l'infrastruttura esistente
+- **Backup & Snapshots** ed annesse procedure di disaster recovery
+- **Località** dei dati (on-premises, cloud, ibrido)
+- Performance richieste (latenza, throughput)
+- Facilità di espansione futura
+- ...
+:::
+
+
+
+
+
 
 # Grazie per l'attenzione!
   Domande?
