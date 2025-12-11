@@ -2,10 +2,10 @@
 title: "Data 101"
 subtitle: "Introduzione al Data Management"
 author: "Isac Pasianotto"
-date: "13 December 2025"
+date: "12 December 2025"
 format:
   revealjs:
-    footer: "Isac Pasianotto - 13/12/2025"
+    footer: "Isac Pasianotto - 12/12/2025"
     theme: ./mytheme.css
     # theme: [dracula, mytheme.css]
     transition: slide
@@ -236,7 +236,7 @@ Insieme delle fasi che un dato attraversa dalla sua creazione alla sua eliminazi
 :::
 
 ::: {.fragment .fade-in style="font-size: 70%;"}
-- Proggettista del DB
+- Progettista del DB
 - Amministratore del DB
 - Sviluppatore di applicazioni
 - Utente finale
@@ -274,7 +274,7 @@ Le *12 regole di Codd* (1970) definiscono le caratteristiche che un DBMS relazio
 
 ::: {.fragment .fade-in style="font-size: 80%;"}
 ::: {.callout-tip title="\ 1 -  Informazioni"}
-Tutte le informazioni in un DBR sono rappresentate esplicitamente da valori in tabelle *(definizione)*.
+Tutte le informazioni in un DBR sono rappresentate esplicitamente da valori in tabelle.
 :::
 :::
 
@@ -708,7 +708,7 @@ Generalmente vengono proposte le seguenti categorie basate sul modello di dati u
 ## a. Key-Value DB
 
 ::: {.fragment .incremental .fade-in style="font-size: 80%;"}
-Una unica tabella di due colonne:
+Un'unica tabella di due colonne:
 
 - **Key**: identificatore univoco per ogni elemento.
 - **Value**: dato associato alla chiave, può essere di qualsiasi tipo (stringa, numero, oggetto complesso, ...).
@@ -1049,7 +1049,7 @@ RETURN DISTINCT ristorante.nome,
 
 ::: {.fragment .incremental .fade-in style="font-size: 80%;"}
 - DB relazionali: 
-   - Scalbilità verticale ottima: aggiunggendo risorse ad un singolo nodo si ottengono buone performance.
+   - Scalabilità verticale ottima: aggiungendo risorse ad un singolo nodo si ottengono buone performance.
    - Scalare su più nodi è complesso, richiede tecniche come sharding e replica e non porta a vantaggi in perfomance (ma può aiutare in disponibilità e tolleranza ai guasti).
 - No-Sql:
    - La maggiorparte sono progettati per scalare orizzontalmente in modo nativo.
@@ -1063,7 +1063,7 @@ In un contesto distribuito:
 
 - ***Consistenza***:  (***C*** - Consistency) tutti i nodi hanno la stessa copia dei dati in ogni momento.
   - I dati saranno sempre aggiornati e coerenti.
-  - Qualsiasi sia il server che risponde ad una richiesta, oterrò la medesima risposta.
+  - Qualsiasi sia il server che risponde ad una richiesta, otterrò la medesima risposta.
 :::
 
 ## Consistenza, disponibilità e tolleranza alle partizioni
@@ -1466,7 +1466,7 @@ Esempio: RAID 0+1 (striping + mirroring)
 
 - I dati sono suddivisi in blocchi e distribuiti su più dischi (RAID 0)  
 - L’intero array RAID 0 è poi duplicato su un secondo set di dischi (RAID 1)
-- Offrre perfornamce simili al RAID 0 con la ridondanza del RAID 1
+- Offre performance simili al RAID 0 con la ridondanza del RAID 1
 :::
 ::::
 :::
@@ -1485,7 +1485,7 @@ Se dovessi scegliere oggi, lo adotterei solo in contesti specifici: (NAS o DAS)
 
 ::: {.incremental .fade-in style="font-size: 80%;"}
 ::: {.callout-note title="1. Replica"}
-La ***replica*** è la creazione di copie identiche dei dati su diversi disposiivi di storage
+La ***replica*** è la creazione di copie identiche dei dati su diversi dispositivi di storage
 :::
 :::
 
@@ -1499,7 +1499,7 @@ La ***ridondanza*** è la duplicazione di componenti critici del sistema (dati, 
 ::: {.callout-note title="3. Resilienza"}
 La ***resilienza*** è la capacità del sistema di recuperare rapidamente da guasti o interruzioni, minimizzando l'impatto sui dati e sulle operazioni.
 
-Non è una tecnologia specifica, ma una proprietà emergente di un un sistema che incorpora replica e ridondanza.
+Non è una tecnologia specifica, ma una proprietà emergente di un sistema che incorpora replica e ridondanza.
 :::
 :::
 
@@ -1544,7 +1544,7 @@ Scenario tipico: ogni dipendente ha una workstation aziendale con storage locale
 :::  {.fragment .fade-in style="font-size: 80%;"}
 Alcuni problemi possono essere mitigati con soluzioni tampone (es. usare un server git) ma non risolvono i problemi alla radice.
 
-In generale si addossala responsabilità di prevenire data losses all'utente finale, il che non è mai una buona idea.
+In generale si addossa la responsabilità di prevenire data losses all'utente finale, il che non è mai una buona idea.
 :::
 
 
@@ -1571,7 +1571,7 @@ Scenario tipico: un server dedicato espone uno spazio di archiviazione condiviso
 Tuttavia...
 
 - Rimane un singolo punto di guasto (SPOF)
-- Il server espone un file system montato dai client, nulla di più
+- Il server espone un file system montato dai clients, nulla di più
 :::
 
 
