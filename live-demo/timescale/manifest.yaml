@@ -1,0 +1,83 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: demo-db-credentials
+type: kubernetes.io/basic-auth
+data:
+  # username: demo
+  # password: changeit123
+  username: ZGVtbw==
+  password: Y2hhbmdlaXQxMjM=
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: demo-db
+spec:
+  instances: 3
+  imageCatalogRef:
+    apiGroup: postgresql.cnpg.io
+    kind: ImageCatalog
+    name: cloudnative-pg-with-timescaledb-image-catalog
+    major: 17
+
+  postgresUID: 1000
+  postgresGID: 1000
+  resources:
+    requests:
+      cpu: "500m"
+      memory: 512Mi
+    limits:
+      cpu: "1000m"
+      memory: 1024Mi
+
+
+  postgresql:
+    shared_preload_libraries:
+    - 'timescaledb'
+
+  storage:
+    size: 3Gi
+    storageClass: "local-path"
+
+  bootstrap:
+    initdb:
+      postInitSQL:
+        - CREATE EXTENSION IF NOT EXISTS timescaledb;
+        - CREATE EXTENSION IF NOT EXISTS timescaledb_toolkit;
+        - CREATE TABLE IF NOT EXISTS metrics (time TIMESTAMPTZ NOT NULL,name TEXT NOT NULL, tags JSONB, fields JSONB );
+        - SELECT create_hypertable('metrics', 'time', if_not_exists => TRUE);
+      database: demo
+      owner: demo
+      secret:
+        name: demo-db-credentials
+
+  superuserSecret:
+    name: demo-db-credentials
+
+  affinity:
+    enablePodAntiAffinity: true
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: ImageCatalog
+metadata:
+  name: cloudnative-pg-with-timescaledb-image-catalog
+spec:
+  images:
+    - major: 17
+      image: docker.io/timescale/timescaledb-ha:pg17
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: demo-db-external
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 5432
+      targetPort: 5432
+      nodePort: 30432
+  selector:
+    cnpg.io/cluster: demo-db
+    role: primary
