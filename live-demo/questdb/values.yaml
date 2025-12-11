@@ -1,0 +1,64 @@
+---
+image:
+  repository: questdb/questdb
+  pullPolicy: IfNotPresent
+  tag: 8.3.3
+
+questdb:
+  env:
+    QDB_LINE_TCP_ENABLED: "true"
+  dataDir: /var/lib/questdb
+  configStorageType: ConfigMap
+  serverConfig:
+    enabled: true
+  loggingConfig:
+    enabled: false
+
+service:
+  type: LoadBalancer
+  port: 9000
+  expose:
+    postgresql:
+      enabled: true
+      port: 8812
+    influxdb:
+      enabled: true
+      port: 9009
+
+persistence:
+  enabled: true
+  accessMode: ReadWriteOnce
+  size: 2Gi
+  annotations: {}
+  storageClass: "local-path"
+
+ingress:
+  enabled: false
+
+resources:
+  requests:
+    memory: "512Mi"
+    cpu: "512m"
+  limits:
+    memory: "1Gi"
+    cpu: "1000m"
+
+metrics:
+  enabled: true
+  port: 9003
+
+serviceAccount:
+  create: true
+
+dataMigration:
+  # image:
+  #   repository: debian
+  #   pullPolicy: IfNotPresent
+  #   tag: 12.10-slim
+  resources:
+    requests:
+      memory: "521Mi"
+      cpu: "500m"
+    limits:
+      memory: "1Gi"
+      cpu: "1"
