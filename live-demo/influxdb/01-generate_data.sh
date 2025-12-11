@@ -1,14 +1,14 @@
 #!/bin/bash
 
-# tsbs_generate_data \
-#   --format=influx \
-#   --use-case=devops \
-#   --scale=20 \
-#   --seed=42 \
-#   --log-interval=10s \
-#   --timestamp-start=2025-01-01T00:00:00Z \
-#   --timestamp-end=2025-01-02T00:00:00Z \
-#   > ./datainflux.gz
+tsbs_generate_data \
+  --format=influx \
+  --use-case=devops \
+  --scale=20 \
+  --seed=42 \
+  --log-interval=40s \
+  --timestamp-start=2025-01-01T00:00:00Z \
+  --timestamp-end=2025-01-02T00:00:00Z \
+  > ./datainflux.gz
 
 tsbs_generate_queries \
     --format=influx \
