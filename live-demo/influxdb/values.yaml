@@ -1,0 +1,49 @@
+---
+resources:
+  limits:
+   cpu: 500m
+   memory: 1024Mi
+  requests:
+   cpu: 300m
+   memory: 512Mi
+
+adminUser:
+  organization: "influxdata"
+  bucket: "default"
+  user: "admin"
+  password: "adminadmin"
+  retention_policy: "0s"
+  token: Hvdo6GOEuk5lu84nM1mN-5kL6_ZYKohoSULc0N09yZ3GW71MoQDH2Jk6y1B7GuITETopH3kzw32m22veFPUF5Q==
+
+persistence:
+  enabled: true
+  storageClass: "local-path"
+  accessMode: ReadWriteOnce
+  size: 1Gi
+  mountPath: /var/lib/influxdb2
+  subPath: ""
+
+service:
+  type: LoadBalancer
+  port: 80
+  targetPort: 8086
+  labels: {}
+  portName: http
+
+serviceAccount:
+  create: false
+  annotations: {}
+
+ingress:
+  enabled: false
+
+pdb:
+  create: true
+  minAvailable: 0
+
+initScripts:
+  enabled: true
+  scripts:
+    init.sh: |+
+      #!/bin/bash
+      influx apply --force yes -u https://raw.githubusercontent.com/influxdata/community-templates/master/influxdb2_operational_monitoring/influxdb2_operational_monitoring.yml
