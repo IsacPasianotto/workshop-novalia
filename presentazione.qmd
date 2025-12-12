@@ -116,19 +116,21 @@ _"Divieto di sosta dalle 08:00 alle 17:00 nei giorni feriali"_
 \ 
 
 ::: {.fragment .fade-in style="font-size: 100%; text-align: center;"}
-**100100111101001101**
+**1011110000111100**
 :::
 
 ::: {.fragment .fade-in style="font-size: 80%;"}
-Che numero è?
+Che cosa mi dice questo dato?
 :::
 
 ::: {.fragment .fade-in style="font-size: 80%;"}
-| Rappresentazione | Valore  |
-|------------------|---------|
-| Naturale         | 37,843  |
-| Intero           | -27,263 |
-| Floating point   | 9.55e-4 |
+| Rappresentazione | Valore     |
+|------------------|------------|
+| Naturale (uint16)| 48,188     |
+| Intero (int16)   | -15,420    |
+| Float16 (FP16)   | -0.0588    |
+| Esadecimale      | BC3C      |
+| UTF-8 (2 char)   | ¼<         |
 :::
 
 ## Database
