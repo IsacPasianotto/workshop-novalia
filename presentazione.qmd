@@ -1345,9 +1345,15 @@ I dati sono memorizzati come file all'interno di un file system (e.g , ext4, NTF
 ::: {.callout-note title="***Def.*** File System"}
 Un **file system** è una struttura logica e un insieme di regole utilizzate da un sistema operativo per organizzare, memorizzare e gestire i file su un dispositivo di archiviazione.
 
-La strruttura logica di un file system è generalmente ad albero o a grafo, con directory (cartelle) che contengono file e altre directory.
+La struttura logica di un file system è generalmente ad albero o a grafo, con directory (cartelle) che contengono file e altre directory.
 
 Un file system gestisce anche i metadati associati ai file, come permessi di accesso, timestamp di creazione/modifica, dimensioni, ecc.
+:::
+
+::: {.fragment .fade-in style="font-size: 70%;"}
+::: {.callout-warning title="Note"}
+*Non tutti i file system sono uguali!* Alcuni presentano più o meno features che possono essere auspicabili, per esempio: COW (Copy On Write), journaling, snapshot, deduplica, compressione, crittografia, supporto a grandi file e volumi, ... 
+:::
 :::
 
 ## Tipologia di archiviazione: Block-based
@@ -1366,8 +1372,9 @@ I dati sono memorizzati in blocchi di dimensioni fisse (e.g., 512 byte, 4 KB, ..
 
 ## Tipologia di archiviazione: Object-based
 
-::: {.fragment .incremental .fade-in style="font-size: 80%;"}
+::: {.fragment .incremental .fade-in style="font-size: 70%;"}
 I dati sono memorizzati come oggetti, ciascuno con un identificatore univoco e metadati associati.
+
 - Vantaggi:
   - Scalabilità orizzontale eccellente
   - Adatto per grandi moli di dati non strutturati
