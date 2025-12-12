@@ -7,7 +7,7 @@ format:
   revealjs:
     footer: "Isac Pasianotto - 12/12/2025"
     theme: ./mytheme.css
-    # theme: [dracula, mytheme.css]
+    # theme: [blood, mytheme.css]
     transition: slide
     scrollable: true
     smaller: false
@@ -966,7 +966,7 @@ RETURN DISTINCT ristorante.nome,
 
 ::: {.fragment .incremental .fade-in style="font-size: 80%;"}
 - Implementazione di uno dei modelli di dati precedenti (key-value, document-based, ...)
-- La differenza è che **i dati sono memorizzati nella memoria pirncipale (RAM)** anziché su archiviazione
+- La differenza è che **i dati sono memorizzati nella memoria principale (RAM)** anziché su archiviazione
 - I dati sono volatili: si perdono in caso di spegnimento del sistema
 - Alcune implementazioni offrono anche meccanismi di persistenza
 :::
@@ -1217,6 +1217,7 @@ Necesità e vincoli:
 - Requirements:
   - Performance in insert ad alta frequeza
   - Scalabilità orizzontale/verticale 
+  - Feature di backup e restore disponibili anche nelle versioni open-source
 :::
 
 ## Esempio 
